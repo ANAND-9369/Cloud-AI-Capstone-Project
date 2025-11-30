@@ -22,8 +22,6 @@ requests==2.31.0
 # DevOps
 Dockerfile>=1.0
 Kubernetes>=28.0
-Terraform>=1.5
-
 # Testing
 pytest==7.4.0
 pytest-cov==4.1.0
