@@ -22,44 +22,43 @@ except ImportError as e:
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
 
+
 class MLPipelineManager:
     """Manages ML pipeline for training and deployment"""
-    
+
     def __init__(self, project_name: str = "Cloud-AI-Capstone"):
         self.project_name = project_name
         logger.info(f"Initializing {project_name}")
-    
+
     def load_data(self, data_path: str) -> pd.DataFrame:
-        """Load training data from file"""
-        logger.info(f"Loading data from {data_path}")
-        return pd.read_csv(data_path)
-    
-    def preprocess_data(self, df: pd.DataFrame) -> tuple:
-        """Preprocess and prepare data for training"""
-        logger.info("Preprocessing data")
-        scaler = StandardScaler()
-        X = scaler.fit_transform(df.drop('target', axis=1))
-        y = df['target']
-        return train_test_split(X, y, test_size=0.2, random_state=42)
-    
-    def train_model(self, X_train, y_train, X_val, y_val):
-        """Train TensorFlow model"""
-        logger.info("Training ML model")
-        model = tf.keras.Sequential([
-            tf.keras.layers.Dense(128, activation='relu', input_shape=(X_train.shape[1],)),
-            tf.keras.layers.Dropout(0.2),
-            tf.keras.layers.Dense(64, activation='relu'),
-            tf.keras.layers.Dense(1, activation='sigmoid')
-        ])
-        model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-        model.fit(X_train, y_train, validation_data=(X_val, y_val), epochs=10)
-        return model
+        """Load data from file"""
+        try:
+            data = pd.read_csv(data_path)
+            logger.info(f"Loaded data with shape: {data.shape}")
+            return data
+        except Exception as e:
+            logger.error(f"Error loading data: {e}")
+            raise
+
+    def preprocess_data(self, data: pd.DataFrame) -> tuple:
+        """Preprocess data for model training"""
+        try:
+            X = data.drop(columns=["target"])
+            y = data["target"]
+            scaler = StandardScaler()
+            X_scaled = scaler.fit_transform(X)
+            logger.info("Data preprocessing completed")
+            return X_scaled, y
+        except Exception as e:
+            logger.error(f"Error preprocessing data: {e}")
+            raise
+
 
 if __name__ == "__main__":
-    logger.info("Starting Cloud-AI Capstone Project")
+    logger.info("Starting ML Pipeline")
     manager = MLPipelineManager()
-    logger.info("Ready for deployment")
+    logger.info("Pipeline initialized successfully")
